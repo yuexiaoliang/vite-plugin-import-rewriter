@@ -34,28 +34,21 @@ export default function vitePluginRewriteImport(options = {}) {
     },
 
     async resolveId(importee, importer, resolveOptions) {
-      if (!prefix) return null;
       if (!importer) return null;
 
       const filename = path.basename(importee);
 
-      const updatedId = normalizePath(
-        importee.replace(filename, newFilename(filename))
-      );
+      const updatedId = normalizePath(importee.replace(filename, newFilename(filename)));
 
-      const filePath = updatedId.startsWith(root)
-        ? updatedId
-        : path.join(root, updatedId);
+      const filePath = updatedId.startsWith(root) ? updatedId : path.join(root, updatedId);
 
       if (await exists(filePath)) {
-        return this.resolve(
-          updatedId,
-          importer,
-          Object.assign({ skipSelf: true }, resolveOptions)
-        ).then((resolved) => resolved || { id: updatedId });
+        return this.resolve(updatedId, importer, Object.assign({ skipSelf: true }, resolveOptions)).then(
+          (resolved) => resolved || { id: updatedId },
+        );
       }
 
       return null;
-    }
+    },
   };
 }
