@@ -1,6 +1,6 @@
-# vite-plugin-rewrite-import
+# vite-plugin-import-rewriter
 
-本插件是一个 `vite` 插件，用于重写模块的导入地址。
+`vite` 重写 `import` 的插件。
 
 ## TODO
 
