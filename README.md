@@ -2,53 +2,6 @@
 
 `vite` 重写 `import` 的插件。
 
-## TODO
-
-### 配置后缀
-
-配置指定后缀的 `import` 才会经过插件重写地址
-
-```js
-// config
-import rewriteImport from 'vite-plugin-reweite-import'
-rewriteImport({
-  mark: 'rewrite'
-})
-
-
-// 使用
-import Header from '@/components/Header.vue?rewrite'; // 会经过插件处理
-import Aside from '@/components/Aside.vue'; // 不会经过插件处理
-```
-
-### 重写方法配置
-
-指定通过自定义的方法进行冲洗
-
-```js
-// config
-import rewriteImport from 'vite-plugin-reweite-import';
-rewriteImport({
-  mark: 'rewrite',
-  methods: {
-    isVueComponent(args) {
-      const { importee, importer, optiosn, config } = args;
-      if (importee.endsWith('.vue')) return true;
-      return false
-    }
-  }
-});
-
-// 使用
-import Footer from '@/components/Footer?rewrite=isVueComponent'; // 会经过 isVueComponent 处理
-import Header from '@/components/Header.vue?rewrite'; // 会经过插件处理
-import Aside from '@/components/Aside.vue'; // 不会经过插件处理
-```
-
-### 兼容 Extensions
-
-处理兼容 `resolve.extensions` 配置
-
 ## 使用
 
 ```js
@@ -106,3 +59,54 @@ import Index from 'Index.vue';
 // 新的
 import Index from 'fixIndex.vue';
 ```
+
+## TODO
+
+### 配置后缀
+
+配置指定后缀的 `import` 才会经过插件重写地址
+
+```js
+// config
+import rewriteImport from 'vite-plugin-reweite-import'
+rewriteImport({
+  mark: 'rewrite'
+})
+
+
+// 使用
+import Header from '@/components/Header.vue?rewrite'; // 会经过插件处理
+import Aside from '@/components/Aside.vue'; // 不会经过插件处理
+```
+
+### 重写方法配置
+
+指定通过自定义的方法进行冲洗
+
+```js
+// config
+import rewriteImport from 'vite-plugin-reweite-import';
+rewriteImport({
+  mark: 'rewrite',
+  methods: {
+    isVueComponent(args) {
+      const { importee, importer, optiosn, config } = args;
+      if (importee.endsWith('.vue')) return true;
+      return false
+    }
+  }
+});
+
+// 使用
+import Footer from '@/components/Footer?rewrite=isVueComponent'; // 会经过 isVueComponent 处理
+import Header from '@/components/Header.vue?rewrite'; // 会经过插件处理
+import Aside from '@/components/Aside.vue'; // 不会经过插件处理
+```
+
+### 兼容 Extensions
+
+处理兼容 `resolve.extensions` 配置
+
+### 只限于指定配置的环境中使用
+
+有一些模块，只能在特定模式下使用，也就是说可能不存在默认模块，这种情况下就会出现导入错误，应解决这个问题。
