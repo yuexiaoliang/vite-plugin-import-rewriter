@@ -1,9 +1,9 @@
 {
   "name": "vite-plugin-import-rewriter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "`vite` 重写 `import` 的插件。",
   "keywords": ["vite", "import", "rewriter", "resolver"],
-  "main": "src/main.ts",
+  "main": "src/index.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
