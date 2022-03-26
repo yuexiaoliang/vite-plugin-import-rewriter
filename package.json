@@ -1,0 +1,19 @@
+{
+  "name": "vite-plugin-import-rewriter",
+  "version": "0.0.1",
+  "description": "`vite` 重写 `import` 的插件。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuexiaoliang/vite-plugin-import-rewriter.git"
+  },
+  "author": "岳晓亮",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuexiaoliang/vite-plugin-import-rewriter/issues"
+  },
+  "homepage": "https://github.com/yuexiaoliang/vite-plugin-import-rewriter#readme"
+}
