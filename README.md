@@ -31,11 +31,12 @@ export default defineConfig({
 
 ## options
 
-- **front**
-  文件名前边要添加的
+### **front**
+  - type: `string`
+  - describe: 文件名前边要拼接的内容
 
 ```js
-// options
+// vite.config.js
 import rewriter from 'vite-plugin-import-rewriter';
 
 export default defineConfig({
@@ -46,6 +47,9 @@ export default defineConfig({
   ]
 });
 
+// ------------ //
+
+// index.js
 // old
 import log from './log';
 // new
@@ -55,7 +59,7 @@ import log from './china/log';
 or
 
 ```js
-// options
+// vite.config.js
 import rewriter from 'vite-plugin-import-rewriter';
 
 export default defineConfig({
@@ -66,6 +70,9 @@ export default defineConfig({
   ]
 });
 
+// ------------ //
+
+// index.js
 // old
 import log from './log';
 // new
@@ -74,12 +81,14 @@ import log from './country/china-log';
 
 ## TODO
 
+> 请注意，下列功能还未实现！！！
+
 ### 配置后缀
 
 配置指定标记的 `import` 才会经过插件重写
 
 ```js
-// config
+// vite.config.js
 import rewriter from 'vite-plugin-import-rewriter';
 
 export default defineConfig({
@@ -91,10 +100,11 @@ export default defineConfig({
   ]
 });
 
-// 会经过插件处理
+// ------------ //
 
+// index.js
 // old
-import log from './log?rewrite';
+import log from './log?rewrite'; // 会经过插件处理
 import err from './err'; // 不会经过插件处理
 
 // new
@@ -107,7 +117,7 @@ import err from './err';
 通过自定义的方法进行重写
 
 ```js
-// config
+// vite.config.js
 import rewriter from 'vite-plugin-import-rewriter';
 import path from 'path';
 
@@ -115,26 +125,29 @@ export default defineConfig({
   plugins: [
     rewriter({
       methods: {
-        rewriterVueComponent({ importee }) {
-          if (!importee.endsWith('.vue')) return importee;
+        rewriterVueComponent({ id }) {
+          if (!id.endsWith('.vue')) return id;
 
-          const filename = path.basename(importee);
-          return importee.replace(filename, `country/China${filename}`);
+          const filename = path.basename(id);
+          return id.replace(filename, `country/China${filename}`);
         }
       }
     })
   ]
 });
 
+// ------------ //
+
+// index.js
 // old
-import Home from './Home.vue?rewrite=rewriterVueComponent'; // 会经过 isVueComponent 处理
+import Home from './Home.vue?rewrite=rewriterVueComponent'; // 会经过 rewriterVueComponent 处理
 import log from '.log'; // 不会经过插件处理
 
 // new
-import Home from './country/ChinaHome.vue'; // 会经过 isVueComponent 处理
+import Home from './country/ChinaHome.vue';
 import log from '.log'
 ```
 
 ### 只限于指定配置的环境中使用
 
-有一些模块，只能在特定模式下使用，也就是说可能不存在默认模块，这种情况下就会出现导入错误，应解决这个问题。
+有一些模块，只能在特定模式下使用，也就是说可能不存在默认模块，这种情况下就会出现导入错误。

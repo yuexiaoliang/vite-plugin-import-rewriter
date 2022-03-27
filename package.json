@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-import-rewriter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "`vite` 重写 `import` 的插件。",
   "keywords": [
@@ -24,7 +24,8 @@
     ]
   },
   "scripts": {
-    "build": "tsup-node"
+    "build": "tsup-node",
+    "build:publish": "npm run build&&npm publish"
   },
   "repository": {
     "type": "git",
