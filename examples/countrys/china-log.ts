@@ -1,1 +1,0 @@
-export default () => console.log('china is good !!!')

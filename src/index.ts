@@ -1,45 +1,34 @@
-import path from 'path';
+import { normalizePath, ResolvedConfig, Plugin } from 'vite';
 
-import {
-  normalizePath,
-  ResolvedConfig,
-  Plugin
-} from 'vite';
+import { PluginContext, ResolveIdResult, CustomPluginOptions } from 'rollup';
 
-import {
-  PluginContext,
-  ResolveIdResult,
-  CustomPluginOptions
-} from 'rollup';
+import getUpdatedId from './getUpdatedId';
 
-import { exists } from './utils';
-
-interface Options {
+export interface Options {
   /**
    * 文件名前边要添加的
    */
   front?: string;
 }
 
+export type TExtensions = string[] | undefined;
+
 export default function vitePluginRewriteImport(options: Options = {}): Plugin {
-  const { front = '' } = options;
-
-  const newFile = (filename: string) =>  `${front}${filename}`;
-
   let root: string;
+  let extensions: TExtensions;
 
   return {
     name: 'vite-plugin-rewrite-import',
-
     enforce: 'pre',
 
     configResolved(config: ResolvedConfig): void | Promise<void> {
       root = normalizePath(config.root);
+      extensions = config.resolve.extensions;
     },
 
     async resolveId(
       this: PluginContext,
-      importee: string,
+      id: string,
       importer: string | undefined,
       resolveIdOptions: {
         custom?: CustomPluginOptions;
@@ -48,27 +37,19 @@ export default function vitePluginRewriteImport(options: Options = {}): Plugin {
     ): Promise<ResolveIdResult> {
       if (!importer) return null;
 
-      const filename = path.basename(importee);
+      const updatedId = await getUpdatedId(id, {
+        options,
+        root,
+        extensions
+      });
 
-      const updatedId = normalizePath(
-        importee.replace(filename, newFile(filename))
+      const resolved = await this.resolve(
+        updatedId,
+        importer,
+        Object.assign({ skipSelf: true }, resolveIdOptions)
       );
 
-      const filePath = normalizePath(
-        updatedId.startsWith(root) ? updatedId : path.join(root, updatedId)
-      );
-
-      if (await exists(filePath)) {
-        const resolved = await this.resolve(
-          updatedId,
-          importer,
-          Object.assign({ skipSelf: true }, resolveIdOptions)
-        );
-
-        return resolved || { id: updatedId };
-      }
-
-      return null;
+      return resolved || { id: updatedId };
     }
   };
 }

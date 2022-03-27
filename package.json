@@ -1,20 +1,37 @@
 {
   "name": "vite-plugin-import-rewriter",
-  "version": "0.1.1",
+  "version": "1.0.0",
+  "type": "module",
   "description": "`vite` 重写 `import` 的插件。",
-  "keywords": ["vite", "import", "rewriter", "resolver"],
-  "main": "src/index.ts",
+  "keywords": [
+    "vite",
+    "import",
+    "rewriter",
+    "resolver"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "clean": true,
+    "dts": true,
+    "format": [
+      "cjs",
+      "esm"
+    ]
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "tsup-node"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yuexiaoliang/vite-plugin-import-rewriter.git"
   },
   "author": "岳晓亮",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/yuexiaoliang/vite-plugin-import-rewriter/issues",
     "email": "2220124666@qq.com"
@@ -22,6 +39,9 @@
   "homepage": "https://github.com/yuexiaoliang/vite-plugin-import-rewriter#readme",
   "devDependencies": {
     "@types/node": "^17.0.23",
+    "@types/resolve": "^1.20.1",
+    "resolve": "^1.22.0",
+    "tsup": "^5.12.1",
     "typescript": "^4.5.4",
     "vite": "^2.8.0"
   }

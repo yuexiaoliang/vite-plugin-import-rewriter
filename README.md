@@ -4,6 +4,17 @@
 
 ## 使用
 
+1. 安装
+
+``` bash
+yarn add -D vite-plugin-import-rewriter
+
+# or
+
+npm install -D vite-plugin-import-rewriter
+```
+
+2. 配置
 ```js
 import rewriter from 'vite-plugin-import-rewriter';
 
