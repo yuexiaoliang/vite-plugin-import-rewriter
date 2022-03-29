@@ -30,6 +30,7 @@ var import_vite2 = require("vite");
 // src/getUpdatedId.ts
 var import_path = __toESM(require("path"), 1);
 var import_vite = require("vite");
+var import_qs = __toESM(require("qs"), 1);
 
 // src/utils.ts
 var import_fs = __toESM(require("fs"), 1);
@@ -52,19 +53,72 @@ var exists = async (filePath) => await import_fs.default.promises.access(filePat
 
 // src/getUpdatedId.ts
 async function getUpdatedId(id, config) {
-  const { front = "" } = config.options;
   const root = (0, import_vite.normalizePath)(config.root);
+  const { start = "rewriter", sign, methods } = config.options;
+  console.log(`\u{1F680} => start`, start);
+  const extensions = config.extensions;
+  let _id = id;
+  if (sign) {
+    if (!isIDIncludeSign(id, sign))
+      return id;
+    const methodName = getSignMethod(id, sign);
+    const deletedId = delSign(id, sign);
+    _id = getNewIDByMethod(deletedId, methodName, methods);
+  }
+  let basename = getIDBasename(_id, start);
+  let newID = resolveNewID(basename, root, extensions);
+  if (!newID)
+    return _id;
+  return await exists(newID) ? newID : _id;
+}
+function getNewIDByMethod(id, methodName, methods) {
+  if (!methodName || !methods)
+    return id;
+  const method = methods == null ? void 0 : methods[methodName];
+  return method(id);
+}
+function getIDSearch(id) {
+  return import_qs.default.parse(id.split("?")[1]);
+}
+function getIDSearchKeys(id) {
+  return Object.keys(getIDSearch(id));
+}
+function getSignMethod(id, sign) {
+  return getIDSearch(id)[sign];
+}
+function delSign(id, sign) {
+  const search = getIDSearch(id);
+  delete search[sign];
+  const keys = Object.keys(search);
+  if (keys.length === 0)
+    return id.split("?")[0];
+  let result = id.split("?")[0] + "?";
+  keys.forEach((key, index) => {
+    const val = search[key];
+    if (index > 0)
+      result += "&";
+    result += val ? `${key}=${val}` : `${key}`;
+  });
+  return result;
+}
+function isIDIncludeSign(id, sign) {
+  const searchKeys = getIDSearchKeys(id);
+  return searchKeys.includes(sign);
+}
+function getIDBasename(id, start) {
+  if (!start)
+    return id;
   const basename = import_path.default.basename(id);
-  let newBasename = (0, import_vite.normalizePath)(id.replace(basename, `${front}${basename}`));
+  return (0, import_vite.normalizePath)(id.replace(basename, `${start}${basename}`));
+}
+function resolveNewID(basename, root, extensions) {
   let filePath;
   try {
-    const _path = newBasename.startsWith(root) ? newBasename : import_path.default.join(root, newBasename);
-    filePath = (0, import_vite.normalizePath)(resolveFrom(_path, import_path.default.dirname(_path), config.extensions));
+    const _path = basename.startsWith(root) ? basename : import_path.default.join(root, basename);
+    filePath = (0, import_vite.normalizePath)(resolveFrom(_path, import_path.default.dirname(_path), extensions));
   } catch (error) {
   }
-  if (!filePath)
-    return id;
-  return await exists(filePath) ? filePath : id;
+  return filePath;
 }
 
 // src/index.ts

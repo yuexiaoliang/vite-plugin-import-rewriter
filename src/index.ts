@@ -4,11 +4,22 @@ import { PluginContext, ResolveIdResult, CustomPluginOptions } from 'rollup';
 
 import getUpdatedId from './getUpdatedId';
 
+export type Methods = {
+  [key: string]: (id: string) => string;
+};
 export interface Options {
   /**
    * 文件名前边要添加的
    */
-  front?: string;
+  start?: string;
+
+  /**
+   * 规定标记
+   * 只有路径参数中包含该标记的文件才会被处理
+   */
+  sign?: string;
+
+  methods?: Methods;
 }
 
 export type TExtensions = string[] | undefined;

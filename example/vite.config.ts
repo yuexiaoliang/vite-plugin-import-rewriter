@@ -1,14 +1,32 @@
+import path from 'path';
+
 import { defineConfig } from 'vite';
-import reweiter from 'vite-plugin-import-rewriter';
+
+import rewriter from 'vite-plugin-import-rewriter';
+
+function getNewID(id: string, newID) {
+  const basename = path.basename(id);
+  return id.replace(basename, newID)
+}
 
 export default defineConfig({
   resolve: {
-    extensions: ['.ts', '.js', '.vue', '.json'],
+    extensions: ['.ts', '.js', '.vue', '.json']
   },
   plugins: [
-    reweiter({
-      front: 'china/' // result: china/log.ts
-      // front: 'countrys/china-' // result: countrys/china-log.ts
+    rewriter({
+      start: 'countrys/china-',
+      sign: 'rewriter-prefix',
+
+      methods: {
+        toJS: (id: string) => {
+          return id + '.js';
+        },
+
+        toChina: (id: string) => {
+          return getNewID(id, 'china/log');
+        }
+      }
     })
   ]
 });

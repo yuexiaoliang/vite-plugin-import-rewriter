@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>vite-plugin-import-rewriter</title>
     <style>
+      body,
+      div,
+      h1,
+      p {
+        margin: 0;
+      }
+
       body {
         width: 100vw;
         height: 100vh;
@@ -19,16 +26,35 @@
         font-size: 30px;
       }
 
-      .msg {
-        color: red;
-        font-size: 20px;
+      .logs {
+        margin-top: 30px;
       }
 
+      .logs p {
+        font-size: 24px;
+        line-height: 2;
+        color: #555;
+      }
+
+      .logs span {
+        color: yellowgreen;
+      }
+
+      .logs b {
+        color: red;
+      }
+
+      .logs .blue {
+        color: blue;
+      }
     </style>
   </head>
   <body>
     <h1 class="title">VitePluginImportRewriter</h1>
-    <p class="msg"></p>
+    <p>重写 `import` 的 `vite` 插件。</p>
+
+    <div class="logs"></div>
+
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
