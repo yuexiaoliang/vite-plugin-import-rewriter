@@ -10,13 +10,15 @@
   </a>
 </p>
 
-[简体中文](README_zh.md)
+[English](README.md)
 
-Rewriter the import based on conditions.
+## 项目介绍
 
-## Usage
+重写 `import` 的 `vite` 插件。
 
-1.Install the plugin
+## 使用
+
+1. 安装
 
 ```bash
 yarn add -D vite-plugin-import-rewriter
@@ -26,7 +28,7 @@ yarn add -D vite-plugin-import-rewriter
 npm install -D vite-plugin-import-rewriter
 ```
 
-2. Configure the plugin
+2. 使用
 
 ```js
 import path from 'path';
@@ -69,7 +71,7 @@ export default defineConfig({
 
 - Default: `rewriter`
 
-  The value of the starting position of the file name to be imported, and then to look for the module after the Mosaic, find the module to be imported, find not to import the original module
+  导入的文件名开始位置拼接的值，然后去查找拼接后的模块，查找到则导入找到的模块，找不到则导入原模块。
 
   ```js
   // vite.config.js
@@ -119,7 +121,7 @@ export default defineConfig({
 
 - Type: `string`
 
-  If configured, only the 'import' of the specified tag will be overridden by the plug-in, otherwise all imports will be processed by the plug-in
+  如果配置了，只有指定标记的 `import` 才会经过插件重写，不指定则所有导入都会经过插件处理。
 
   ```js
   // vite.config.js
@@ -150,7 +152,7 @@ export default defineConfig({
 
 - Type: `{ [key: string]: (id: string) => string; }`
 
-  Override with custom methods
+  通过自定义的方法进行重写
 
   ```js
   // vite.config.js
@@ -200,7 +202,8 @@ export default defineConfig({
 
 ## TODO
 
-- [ ] Limited to the environment specified in the configuration
+- [ ] 只限于指定配置的环境中使用
+
 
 ## License
 

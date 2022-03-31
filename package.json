@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-import-rewriter",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "重写 `import` 的 `vite` 插件",
   "keywords": [
