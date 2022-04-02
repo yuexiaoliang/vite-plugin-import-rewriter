@@ -3,7 +3,7 @@ import { Plugin } from 'vite';
 declare type Methods = {
     [key: string]: (id: string) => string;
 };
-interface Options {
+interface UserOptions {
     /**
      * 文件名前边要添加的
      */
@@ -14,8 +14,9 @@ interface Options {
      */
     sign?: string;
     methods?: Methods;
+    virtualModule?: string;
 }
-declare type TExtensions = string[] | undefined;
-declare function vitePluginRewriteImport(options?: Options): Plugin;
 
-export { Methods, Options, TExtensions, vitePluginRewriteImport as default };
+declare function vitePluginRewriteImport(options?: UserOptions): Plugin;
+
+export { vitePluginRewriteImport as default };

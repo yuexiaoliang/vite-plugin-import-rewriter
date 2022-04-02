@@ -2,8 +2,22 @@ var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
@@ -25,16 +39,8 @@ __export(src_exports, {
   default: () => vitePluginRewriteImport
 });
 module.exports = __toCommonJS(src_exports);
-var import_vite2 = require("vite");
 
-// src/getUpdatedId.ts
-var import_path = __toESM(require("path"), 1);
-var import_vite = require("vite");
-var import_qs = __toESM(require("qs"), 1);
-
-// src/utils.ts
-var import_fs = __toESM(require("fs"), 1);
-var import_resolve = __toESM(require("resolve"), 1);
+// src/consts.ts
 var DEFAULT_EXTENSIONS = [
   ".mjs",
   ".js",
@@ -43,51 +49,39 @@ var DEFAULT_EXTENSIONS = [
   ".tsx",
   ".json"
 ];
-var resolveFrom = (id, basedir, extensions) => {
-  return import_resolve.default.sync(id, {
-    basedir,
-    extensions: extensions || DEFAULT_EXTENSIONS
-  });
+var DEFAULT_OPTIONS = {
+  start: "rewriter"
 };
-var exists = async (filePath) => await import_fs.default.promises.access(filePath).then(() => true).catch((_) => false);
 
-// src/getUpdatedId.ts
-async function getUpdatedId(id, config) {
-  const root = (0, import_vite.normalizePath)(config.root);
-  const { start = "rewriter", sign, methods } = config.options;
-  console.log(`\u{1F680} => start`, start);
-  const extensions = config.extensions;
-  let _id = id;
-  if (sign) {
-    if (!isIDIncludeSign(id, sign))
-      return id;
-    const methodName = getSignMethod(id, sign);
-    const deletedId = delSign(id, sign);
-    _id = getNewIDByMethod(deletedId, methodName, methods);
+// src/utils.ts
+var import_path = __toESM(require("path"), 1);
+var import_resolve = __toESM(require("resolve"), 1);
+var import_vite = require("vite");
+var import_qs = __toESM(require("qs"), 1);
+var resolvePath = (_path, extensions) => {
+  try {
+    return import_resolve.default.sync(_path, {
+      basedir: import_path.default.dirname(_path),
+      extensions: extensions || DEFAULT_EXTENSIONS
+    });
+  } catch (error) {
+    return "";
   }
-  let basename = getIDBasename(_id, start);
-  let newID = resolveNewID(basename, root, extensions);
-  if (!newID)
-    return _id;
-  return await exists(newID) ? newID : _id;
-}
-function getNewIDByMethod(id, methodName, methods) {
+};
+var isExistsFile = (_path, extensions) => {
+  return !!resolvePath(_path, extensions);
+};
+function getNewIdByMethod(id, methodName, methods) {
   if (!methodName || !methods)
     return id;
   const method = methods == null ? void 0 : methods[methodName];
   return method(id);
 }
-function getIDSearch(id) {
-  return import_qs.default.parse(id.split("?")[1]);
-}
-function getIDSearchKeys(id) {
-  return Object.keys(getIDSearch(id));
-}
 function getSignMethod(id, sign) {
-  return getIDSearch(id)[sign];
+  return getIdSearch(id)[sign];
 }
 function delSign(id, sign) {
-  const search = getIDSearch(id);
+  const search = getIdSearch(id);
   delete search[sign];
   const keys = Object.keys(search);
   if (keys.length === 0)
@@ -101,24 +95,46 @@ function delSign(id, sign) {
   });
   return result;
 }
-function isIDIncludeSign(id, sign) {
-  const searchKeys = getIDSearchKeys(id);
+function isIdIncludeSign(id, sign) {
+  const searchKeys = getIdSearchKeys(id);
   return searchKeys.includes(sign);
 }
-function getIDBasename(id, start) {
+function getIdBasename(id, start) {
   if (!start)
     return id;
   const basename = import_path.default.basename(id);
   return (0, import_vite.normalizePath)(id.replace(basename, `${start}${basename}`));
 }
-function resolveNewID(basename, root, extensions) {
-  let filePath;
-  try {
-    const _path = basename.startsWith(root) ? basename : import_path.default.join(root, basename);
-    filePath = (0, import_vite.normalizePath)(resolveFrom(_path, import_path.default.dirname(_path), extensions));
-  } catch (error) {
+function getResolvePath(basename, root, extensions) {
+  const _path = basename.startsWith(root) ? basename : import_path.default.join(root, basename);
+  return (0, import_vite.normalizePath)(resolvePath(_path, extensions));
+}
+function getIdSearch(id) {
+  return import_qs.default.parse(id.split("?")[1]);
+}
+function getIdSearchKeys(id) {
+  return Object.keys(getIdSearch(id));
+}
+
+// src/getResolveId.ts
+function getResolveId(id, options) {
+  const { start = DEFAULT_OPTIONS.start, sign, methods, root } = options;
+  const extensions = options.extensions;
+  let resolveID = id;
+  if (sign) {
+    if (!isIdIncludeSign(id, sign))
+      return id;
+    const methodName = getSignMethod(id, sign);
+    const deletedId = delSign(id, sign);
+    resolveID = getNewIdByMethod(deletedId, methodName, methods);
   }
-  return filePath;
+  let basename = getIdBasename(resolveID, start);
+  let newResolveID = getResolvePath(basename, root, extensions);
+  if (newResolveID && isExistsFile(newResolveID))
+    return newResolveID;
+  if (isExistsFile(getResolvePath(resolveID, root, extensions)))
+    return resolveID;
+  return `@${start}-virtual-module`;
 }
 
 // src/index.ts
@@ -129,19 +145,24 @@ function vitePluginRewriteImport(options = {}) {
     name: "vite-plugin-rewrite-import",
     enforce: "pre",
     configResolved(config) {
-      root = (0, import_vite2.normalizePath)(config.root);
+      root = config.root;
       extensions = config.resolve.extensions;
     },
     async resolveId(id, importer, resolveIdOptions) {
       if (!importer)
         return null;
-      const updatedId = await getUpdatedId(id, {
-        options,
+      const resolveId = await getResolveId(id, __spreadValues({
         root,
         extensions
-      });
-      const resolved = await this.resolve(updatedId, importer, Object.assign({ skipSelf: true }, resolveIdOptions));
-      return resolved || { id: updatedId };
+      }, options));
+      const resolved = await this.resolve(resolveId, importer, Object.assign({ skipSelf: true }, resolveIdOptions));
+      return resolved || { id: resolveId };
+    },
+    load(id) {
+      const { start = DEFAULT_OPTIONS.start, virtualModule } = options;
+      if (id === `@${start}-virtual-module`) {
+        return virtualModule;
+      }
     }
   };
 }

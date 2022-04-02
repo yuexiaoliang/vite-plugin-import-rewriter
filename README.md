@@ -49,7 +49,7 @@ export default defineConfig({
 
       methods: {
         toJS: (id: string) => {
-          return id + '.js';
+          return id + '-js.js';
         },
 
         toChina: (id: string) => {
@@ -171,7 +171,7 @@ export default defineConfig({
 
         methods: {
           toJS: (id: string) => {
-            return id + '.js';
+            return id + '-js.js';
           },
 
           toChina: (id: string) => {
@@ -198,9 +198,45 @@ export default defineConfig({
   import log4 from './src/china/log';
   ```
 
-## TODO
+### **virtualModule**
 
-- [ ] Limited to the environment specified in the configuration
+- Type: `string`
+
+  Specify a virtual module to avoid errors if there is no default module.
+
+  ```js
+  // vite.config.js
+  import path from 'path';
+  import { defineConfig } from 'vite';
+  import rewriter from 'vite-plugin-import-rewriter';
+
+  export default defineConfig({
+    plugins: [
+      rewriter({
+        start: 'countrys/china-',
+        sign: 'rewriter-prefix',
+
+        methods: {
+          toChina: (id: string) => {
+            const basename = path.basename(id);
+            return id.replace(basename, 'china/' + basename);
+          }
+        },
+        virtualModule: `
+          export default (logs) => {
+            logs.push('<p>this is <span>vite.config<b>.ts</b></span></p>');
+          };
+        `
+      })
+    ]
+  });
+
+  // ------------ //
+
+  // index.js
+  import log1 from './src/not-module?rewriter-prefix'; // ./src/china/not-module.ts
+  import log2 from './src/not-module?rewriter-prefix=toChina'; // vite.config.ts ==> plugins.rewriter.virtualModule
+  ```
 
 ## License
 

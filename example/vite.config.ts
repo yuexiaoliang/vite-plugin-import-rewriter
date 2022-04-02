@@ -4,15 +4,7 @@ import { defineConfig } from 'vite';
 
 import rewriter from 'vite-plugin-import-rewriter';
 
-function getNewID(id: string, newID) {
-  const basename = path.basename(id);
-  return id.replace(basename, newID)
-}
-
 export default defineConfig({
-  resolve: {
-    extensions: ['.ts', '.js', '.vue', '.json']
-  },
   plugins: [
     rewriter({
       start: 'countrys/china-',
@@ -20,13 +12,22 @@ export default defineConfig({
 
       methods: {
         toJS: (id: string) => {
-          return id + '.js';
+          return id + '-js.js';
         },
 
         toChina: (id: string) => {
-          return getNewID(id, 'china/log');
+          const basename = path.basename(id);
+          return id.replace(basename, 'china/' + basename);
         }
-      }
+      },
+
+      virtualModule: `
+        export default (logs, path) => {
+          logs.push(
+          \`<div class="box"><p>import log from <span>'\${path}'</span></p><p>this is <span>vite.config<b>.ts</b></span></p></div>\`
+          );
+        };
+      `
     })
   ]
 });
